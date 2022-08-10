@@ -1,4 +1,4 @@
-package keycloak
+package main
 
 import (
 	"bytes"
@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"cns.bg/gohub/tracing"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
@@ -117,7 +116,8 @@ func (k *Keycloak) Authorize(ctx *gin.Context, data url.Values, r *string) (*Aut
 	req.Header.Set("Content-Length", strconv.Itoa(len(data.Encode())))
 
 	client := &http.Client{
-		Transport: otelhttp.NewTransport(tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport)), otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+		//TOOD: tracing middleware -> tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport))
+		Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
 			return ctx.FullPath()
 		})),
 	}
@@ -229,7 +229,8 @@ func (k *Keycloak) CreateClient(ctx *gin.Context, name string, rootUrl string, b
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{
-		Transport: otelhttp.NewTransport(tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport)), otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+		//TODO: tracing middleware -> tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport)),
+		Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
 			return ctx.FullPath()
 		}))}
 	resp, err := client.Do(req)
@@ -276,7 +277,8 @@ func (k *Keycloak) GetClientIdByName(ctx *gin.Context, name string) (*string, er
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{
-		Transport: otelhttp.NewTransport(tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport)), otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+		//TODO: tracing -> tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport))
+		Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
 			return ctx.FullPath()
 		})),
 	}
@@ -327,7 +329,8 @@ func (k *Keycloak) SetClientSecret(ctx *gin.Context, id string) (*string, error)
 	req.Header.Add("Authorization", "Bearer "+*token)
 
 	client := &http.Client{
-		Transport: otelhttp.NewTransport(tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport)), otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+		//TOOD: tracing -> tracing.NewTraceResponseBodyTransport(tracing.NewTraceResponseBodyTransport(http.DefaultTransport))
+		Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
 			return ctx.FullPath()
 		})),
 	}
